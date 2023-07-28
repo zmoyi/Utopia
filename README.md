@@ -40,5 +40,5 @@ SCOUT_DRIVER=database
 
 ### 导入全文搜索索引
 ```shell
-php artisan scout:import "App\Models\CardCodes"
+php artisan scout:import "App\Models\CardCodes "
 ```

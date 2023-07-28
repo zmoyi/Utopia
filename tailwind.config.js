@@ -3,7 +3,9 @@ import forms from '@tailwindcss/forms'
 import typography from '@tailwindcss/typography'
 export default {
     content: [
-        './resources/**/*.blade.php',
+        "./resources/**/*.blade.php",
+        "./resources/**/*.js",
+        "./resources/**/*.vue",
         './vendor/filament/**/*.blade.php',
     ],
     darkMode: 'class',
