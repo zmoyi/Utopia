@@ -130,6 +130,9 @@ class CardCodeService
 
     public static function getUserQuantity()
     {
+        if (!isset(\auth()->user()->member->card_codes_quota)){
+            return 0;
+        }
         return \auth()->user()->member->card_codes_quota;
     }
 }

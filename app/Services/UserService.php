@@ -155,7 +155,11 @@ class UserService
      */
     public static function getUserMemberExpirationDate(Authenticatable|User $user): string
     {
+        if (!isset($user->member->expiration_date)){
+            return '未订购会员';
+        }
         return Carbon::parse($user->member->expiration_date)->toDateString();
+
     }
 
 }
