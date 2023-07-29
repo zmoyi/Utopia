@@ -36,10 +36,10 @@ class OTPService
      */
     public function verifyTOTP(string $otp): bool
     {
-        $secret = Cache::pull($otp);
-        if (empty($secret)){
+        if (!Cache::has($otp)){
             throw new Exception('令牌错误', 100);
         }
+        $secret = Cache::pull($otp);
         $totp = TOTP::createFromSecret($secret);
         $totp->setDigits(8);
         $totp->setPeriod(10);
