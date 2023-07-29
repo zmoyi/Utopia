@@ -43,9 +43,7 @@ class CardCodeController extends Controller
     {
         $requestData = new CodeDataDTO($request->all());
         $data = $this->cardCodesService->heartbeat($requestData->toArray());
-        return response()->json([
-            'data' => $data
-        ]);
+        return response()->json($data);
     }
 
     /**
@@ -69,15 +67,9 @@ class CardCodeController extends Controller
             'data.array' => 'data必需为array类型',
 
         ]);
-        if ($request->has('type') && $request->has('privateKey') && $request->has('data')) {
+
             $data = $this->cardCodesService->signature($request->input('type'), $request->input('privateKey'), $request->input('data'));
-            return response()->json([
-                'data' => $data
-            ]);
-        } else {
-            return response()->json([
-                'message' => '数据不完整'
-            ], 500);
-        }
+            return response()->json($data);
+
     }
 }
