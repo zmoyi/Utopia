@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('v1')->group(function (){
-    Route::get('get-token',[OTPController::class,'getToken']);
+    Route::post('get-token',[OTPController::class,'getToken']);
     Route::middleware('otp')->group(function (){
         Route::post('verify-card-code',[CardCodeController::class, 'verifyCode']);
         Route::post('heartbeat',[CardCodeController::class,'heartbeat']);
