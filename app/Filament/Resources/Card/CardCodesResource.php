@@ -38,7 +38,6 @@ class CardCodesResource extends Resource
                 Forms\Components\TextInput::make('usage_limit')
                     ->numeric()
                     ->required()
-                    ->mask(fn(Mask $mask) => $mask->minValue(1)->maxValue(10))
                     ->label('可使用次数'),
                 Forms\Components\DateTimePicker::make('expiration_date')
                     ->required()
