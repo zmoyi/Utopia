@@ -55,10 +55,15 @@ class CardCodesService
             $activationCount = $cardCode->activation_count + 1;
         } else {
             // 卡密已失效，抛出异常
-            throw new Exception('该卡密已失效，无法再次激活！');
+            return [
+                'code' => 101,
+                'message' => '卡密可使用次数为0，请联系管理员处理',
+                'data' => $this->returnData($cardCode)
+            ];
         }
 
         $this->addCodeList($cardCode, [
+            'user_id' => $app->user_id,
             'activation_ip' => $deCodeData['activation_ip'],
             'activation_device' => $deCodeData['activation_device'],
             'activation_app_signature' => $deCodeData['activation_app_signature'],
@@ -68,7 +73,11 @@ class CardCodesService
         ]);
 
 
-        return $this->returnData($cardCode);
+        return [
+            'code' => 200,
+            'message' => '卡密激活成功',
+            'data' => $this->returnData($cardCode)
+        ];
 
     }
 
@@ -81,6 +90,7 @@ class CardCodesService
     protected function addCodeList(CardCodes|Model $cardCodes, array $data): Model
     {
         return $cardCodes->activations()->create([
+            'user_id' => $data['user_id'],
             'activated_at' => now(),
             'activation_ip' => $data['activation_ip'],
             'activation_device' => $data['activation_device'],
@@ -137,39 +147,53 @@ class CardCodesService
         $cardCode = CardCodes::query()->where('code', $deCodeData['code'])->first();
 
         /**
-         * 查询公钥
-         */
-        $app = $cardCode->app;
-
-
-        /**
          * 判断卡密是否存在
          */
         if (!$cardCode) {
             // 若未找到对应的卡密，则抛出异常或进行其他处理
-            throw new Exception('卡密不存在');
+            return [
+                'code' => 102,
+                'message' => '卡密不存在'
+            ];
         }
 
-        if (isset($deCodeData['token'])&&!$cardCode->active) {
-            throw new Exception('卡密已被停用');
+        if (isset($deCodeData['token']) && !$cardCode->active) {
+            return [
+                'code' => 103,
+                'message' => '卡密已被停用'
+            ];
         }
+
+        /**
+         * 查询公钥
+         */
+        $app = $cardCode->app;
 
         /**
          * 校验卡密数据
          */
         if (!$this->EC->verifySignature($deCodeData, $data['sign'], $app->public_key)) {
-            throw new Exception('卡密数据校验失败');
+            return [
+                'code' => 104,
+                'message' => '卡密数据校验失败'
+            ];
         }
 
         /**
          * 判断卡密是否过期
          */
         if (Carbon::parse($cardCode->expiration_date)->isPast()) {
-            throw new Exception('卡密已过期');
+            return [
+                'code' => 105,
+                'message' => '卡密已过期'
+            ];
         }
 
         if (isset($deCodeData['token']) && $deCodeData['token'] !== md5($cardCode->secret_key)) {
-            throw new Exception('心跳令牌错误');
+            return [
+                'code' => 106,
+                'message' => '心跳令牌错误'
+            ];
         }
 
         return array($deCodeData, $cardCode, $app);
@@ -185,7 +209,7 @@ class CardCodesService
         $time = Carbon::now()->timestamp;
         $x = md5($cardCode->secret_key);
         return [
-            'over_date' => $cardCode->expiration_date,
+            'date' => $cardCode->expiration_date,
             'token' => $x,
             'remark' => $cardCode->note,
             'time' => $time,
@@ -206,19 +230,24 @@ class CardCodesService
      */
     public function signature(string $type, string $privateKey, array $data): array
     {
-        if ($type === 'heartbeat'){
+        $deData = null;
+        if ($type === 'heartbeat') {
             $deData = new HeartDataDTO($data);
-        }elseif ($type === 'card'){
+        } elseif ($type === 'card') {
             $deData = new DeCodeDataDTO($data);
         }
         $deData = $deData->toArray();
 
         $enData = base64_encode(json_encode($deData));
-        $sign = base64_encode($this->EC->generateSignature($deData,$privateKey));
+        $sign = base64_encode($this->EC->generateSignature($deData, $privateKey));
 
         return [
-            'data' => $enData,
-            'sign' => $sign
+            'code' => 200,
+            'message' => '签名成功',
+            'data' => [
+                'data' => $enData,
+                'sign' => $sign
+            ]
         ];
     }
 }
