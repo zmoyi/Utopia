@@ -147,29 +147,29 @@ class CardCodesService
          */
         if (!$cardCode) {
             // 若未找到对应的卡密，则抛出异常或进行其他处理
-            throw new Exception('卡密不存在', 100);
+            throw new Exception('卡密不存在');
         }
 
         if (isset($deCodeData['token'])&&!$cardCode->active) {
-            throw new Exception('卡密已被停用', 101);
+            throw new Exception('卡密已被停用');
         }
 
         /**
          * 校验卡密数据
          */
         if (!$this->EC->verifySignature($deCodeData, $data['sign'], $app->public_key)) {
-            throw new Exception('卡密数据校验失败', 102);
+            throw new Exception('卡密数据校验失败');
         }
 
         /**
          * 判断卡密是否过期
          */
         if (Carbon::parse($cardCode->expiration_date)->isPast()) {
-            throw new Exception('卡密已过期', 103);
+            throw new Exception('卡密已过期');
         }
 
         if (isset($deCodeData['token']) && $deCodeData['token'] !== md5($cardCode->secret_key)) {
-            throw new Exception('心跳令牌错误', 104);
+            throw new Exception('心跳令牌错误');
         }
 
         return array($deCodeData, $cardCode, $app);
