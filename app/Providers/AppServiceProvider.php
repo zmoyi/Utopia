@@ -17,9 +17,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(BaseService::class, function ($app){
-            return new BaseService(Auth::user());
-        });
     }
 
     /**

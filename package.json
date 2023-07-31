@@ -17,6 +17,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
-        "@awcodes/alpine-floating-ui": "^3.5.0"
+        "@awcodes/alpine-floating-ui": "^3.5.0",
+        "clipboard": "^2.0.11"
     }
 }
