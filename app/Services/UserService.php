@@ -22,7 +22,12 @@ class UserService
      */
     public function getRole(): Collection
     {
-        return Role::query()->get()->pluck('name', 'name');
+        if (auth()->user()->hasAnyRole(['super_admin'])){
+            return Role::query()->get()->pluck('name', 'name');
+        }else{
+            return Role::query()->whereNotIn('name', ['super_admin'])->pluck('name', 'name');
+        }
+
     }
 
     /**
@@ -155,7 +160,7 @@ class UserService
      */
     public static function getUserMemberExpirationDate(Authenticatable|User $user): string
     {
-        if (!isset($user->member->expiration_date)){
+        if (!isset($user->member->expiration_date)) {
             return '未订购会员';
         }
         return Carbon::parse($user->member->expiration_date)->toDateString();
