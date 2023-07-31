@@ -117,9 +117,11 @@ class CardCodesService
          */
         list($deCodeData, $cardCode, $app) = $this->decrypt(self::HEART, $data);
 
-        return $this->returnData($cardCode);
-
-
+        return [
+            'code' => 200,
+            'message' => '心跳验证成功',
+            'data' => $this->returnData($cardCode)
+        ];
     }
 
     /**

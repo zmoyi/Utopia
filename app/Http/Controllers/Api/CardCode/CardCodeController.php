@@ -22,14 +22,20 @@ class CardCodeController extends Controller
      * 验证卡密
      * @param Request $request
      * @return JsonResponse
-     * @throws Throwable
      */
     public function verifyCode(Request $request): JsonResponse
     {
 
-        $requestData = new CodeDataDTO($request->all());
-        $data = $this->cardCodesService->ActivateCardCode($requestData->toArray());
-        return response()->json($data);
+        try {
+            $requestData = new CodeDataDTO($request->all());
+            $data = $this->cardCodesService->ActivateCardCode($requestData->toArray());
+            return response()->json($data);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
+
 
     }
 
@@ -37,20 +43,25 @@ class CardCodeController extends Controller
      * 心跳验证
      * @param Request $request
      * @return JsonResponse
-     * @throws Throwable
      */
     public function heartbeat(Request $request): JsonResponse
     {
-        $requestData = new CodeDataDTO($request->all());
-        $data = $this->cardCodesService->heartbeat($requestData->toArray());
-        return response()->json($data);
+        try {
+            $requestData = new CodeDataDTO($request->all());
+            $data = $this->cardCodesService->heartbeat($requestData->toArray());
+            return response()->json($data);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
+
     }
 
     /**
      * 签名数据
      * @param Request $request
      * @return JsonResponse
-     * @throws Throwable
      */
     public function signature(Request $request): JsonResponse
     {
@@ -58,7 +69,7 @@ class CardCodeController extends Controller
             'type' => 'required|string',
             'privateKey' => 'required|string',
             'data' => 'required|array'
-        ],[
+        ], [
             'type.required' => 'type必填',
             'type.string' => 'type必需为string类型',
             'privateKey.required' => 'privateKey必填',
@@ -68,8 +79,15 @@ class CardCodeController extends Controller
 
         ]);
 
+        try {
             $data = $this->cardCodesService->signature($request->input('type'), $request->input('privateKey'), $request->input('data'));
             return response()->json($data);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
+
 
     }
 }
