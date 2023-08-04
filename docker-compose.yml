@@ -7,6 +7,67 @@ services:
         image: utopia
         container_name: utopia
         restart: unless-stopped
-        working_dir: ./www/app
+        working_dir: /www/app
+
         volumes:
-            -
+            - ./:/www/app
+        networks:
+            - utopia
+        depends_on:
+            - db
+            - redis
+            - nginx
+    db:
+        image: mysql:5.7
+        container_name: utopia_db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_USER: ${DB_USERNAME}
+        volumes:
+            - mysql:/var/lib/mysql
+        networks:
+            - utopia
+    redis:
+        image: redis
+        container_name: utopia_redis
+        restart: unless-stopped
+        command: 'redis-server --appendonly yes'
+        volumes:
+            - redis:/data
+        networks:
+            - utopia
+    nginx:
+        image: nginx
+        container_name: utopia_nginx
+        restart: unless-stopped
+        ports:
+            - '8080:80'
+            - '446:443'
+        volumes:
+            - ./:/www/app
+            - ./nginx:/etc/nginx/conf.d
+        networks:
+            - utopia
+    phpAdmin:
+        image: phpmyadmin
+        container_name: utopia_phpMyAdmin
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - '6623:80'
+        networks:
+            - utopia
+volumes:
+    mysql:
+        external: true
+    redis:
+        external: true
+networks:
+    utopia:
+        driver: bridge
+
+
