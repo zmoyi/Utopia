@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+    app:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        image: utopia
+        container_name: utopia
+        restart: unless-stopped
+        working_dir: ./www/app
+        volumes:
+            -

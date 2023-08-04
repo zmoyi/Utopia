@@ -17,3 +17,8 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/redis-data/appendonlydir/appendonly.aof.1.base.rdb
+/redis-data/appendonlydir/appendonly.aof.1.incr.aof
+/redis-data/appendonlydir/appendonly.aof.manifest
+/composer.phar
+/redis-data/dump.rdb
