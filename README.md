@@ -46,3 +46,9 @@ php artisan shield:install
 
 php artisan scout:import "App\Models\CardCodes"
 ```
+
+### 配置队列
+
+```
+php artisan queue:work -v
+```
